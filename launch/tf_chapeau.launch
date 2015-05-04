@@ -1,0 +1,4 @@
+<launch>
+	<node pkg="tf" type="static_transform_publisher" 
+		name="chapeau" args=" 0.018722891374538225 -0.0001460926736723614 -0.07191569638566736 0.07449427787424723 -0.5152825883278973 -0.0073123003916166895 ar_marker_2 mon_tf/head 30"/>
+</launch>

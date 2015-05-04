@@ -1,0 +1,33 @@
+
+<launch>
+
+
+	<node pkg="tf" type="static_transform_publisher" 
+	name="map" args="0 0 0 0 0 0 /map /axis_camera 30"/>
+
+	
+
+
+	<!--   *********************** ar_track_avlar *************   -->
+	
+	<arg name="marker_size" default="12.0" />		
+	<arg name="max_new_marker_error" default="0.08" />
+	<arg name="max_track_error" default="0.2" />
+	<arg name="cam_image_topic0" default="image_raw" />
+	<arg name="cam_info_topic0" default="/camera_info" />		
+	<arg name="output_frame0" default="/map" />
+
+	<node name="ar_track_alvar0" pkg="ar_track_alvar" type="individualMarkersNoKinect" respawn="false" output="screen" args="$(arg marker_size) $(arg max_new_marker_error) $(arg max_track_error) $(arg cam_image_topic0) $(arg cam_info_topic0) $(arg output_frame0)" >
+
+	<remap from="/visualization_marker" to="cam0/visualization_marker"/>
+ 	</node>
+
+
+	<!--*********************** mon_noeud ***********************************-->
+
+	<node name="calibration_multi_cam" pkg="detection_multi_cam" type="create_launch_tf_axis.py" output="screen" respawn="false" > 
+    <param name="nbr_cam" value="2" />
+	</node>
+	
+
+</launch>

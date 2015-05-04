@@ -1,0 +1,31 @@
+<launch>
+	
+	<include file="$(find detection_multi_cam)/launch/launch_tf.launch"/>
+
+	<!--   *********************** Camera0 *************   -->
+	
+	<arg name="marker_size" default="20.0" />		# plus gros TODO print  
+	<arg name="max_new_marker_error" default="0.08" />
+	<arg name="max_track_error" default="0.2" />
+	<arg name="cam_image_topic0" default="/cam0/image_raw" />
+	<arg name="cam_info_topic0" default="/cam0/camera_info" />		
+	<arg name="output_frame0" default="/camera0" />
+
+	<node name="ar_track_alvar0" pkg="ar_track_alvar" type="individualMarkersNoKinect" respawn="false" output="screen" args="$(arg marker_size) $(arg max_new_marker_error) $(arg max_track_error) $(arg cam_image_topic0) $(arg cam_info_topic0) $(arg output_frame0)" >
+	<remap from="/visualization_marker" to="cam0/visualization_marker"/>
+ 	</node>
+
+
+	<!--**************************** Camera1 ***************************-->
+
+	
+	<arg name="cam_image_topic1" default="/cam1/image_raw" />
+	<arg name="cam_info_topic1" default="/cam1/camera_info" />		
+	<arg name="output_frame1" default="/camera1" />
+
+	<node name="ar_track_alvar1" pkg="ar_track_alvar" type="individualMarkersNoKinect" respawn="false" output="screen" args="$(arg marker_size) $(arg max_new_marker_error) $(arg max_track_error) $(arg cam_image_topic1) $(arg cam_info_topic1) $(arg output_frame1)" >
+	<remap from="/visualization_marker" to="cam1/visualization_marker"/>
+ 	</node>
+
+
+</launch>
