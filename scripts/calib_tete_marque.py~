@@ -1,6 +1,6 @@
 #!/usr/bin/env python  
 import roslib
-roslib.load_manifest('mark_tracker')
+roslib.load_manifest('detection_multi_cam')
 import rospy
 import math
 import tf

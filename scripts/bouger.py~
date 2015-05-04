@@ -36,6 +36,7 @@ class bouger:
 	def timer_callback(self,data):
 		
 			Head = self.motionProxy.getPosition('Head',0, True)
+			self.motionProxy.moveTo(x, y, theta)
 			#PositionRight = self.motionProxy.getPosition('RForeArm',0, True)
 			print Head
 		

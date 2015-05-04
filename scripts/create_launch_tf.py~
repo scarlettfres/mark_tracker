@@ -76,8 +76,8 @@ class create_tf:
 		
 		#0.175462652377 0.085071202854 2.94358463649 1.53053258111 -0.178616594811 -3.0794539535 /camera /map 30
 			message = message+ str(data.pose.position.x)+" "+str(data.pose.position.y)+" "+str(data.pose.position.z)+" "	# transaltion puis rotation (attention pas le meme ordre dangles)
-			message = message+str(euler[2])+" "+str(euler[1])+" "+str(euler[0])+" /map /camera" + str(num) +str(""" 30"/>
-""")
+			message = message+str(euler[2])+" "+str(euler[1])+" "+str(euler[0])+" /map /axis_camera 30"/>
+
 			if num == nbr_camera-1:
 				message=message + "</launch>"
 			print "======message saved in launchfile : "
@@ -113,28 +113,27 @@ class create_tf:
 
 	def mark1_callback(self,data):
 	
-	
-		self.marker.pose.position.x = rospy.get_param("/server_nodes/x")
-		self.marker.pose.position.y = rospy.get_param("/server_nodes//y")
-		self.marker.pose.position.z = rospy.get_param("/server_nodes//z")
+		"""
+		mark_x = rospy.get_param("/marker_parameters/x")
+		mark_y = rospy.get_param("/marker_parameters/y")
+		mark_z = rospy.get_param("/marker_parameters/z")
 		
-		r = rospy.get_param("/server_nodes//Roll")
-		p = rospy.get_param("/server_nodes//Pitch")
-		y = rospy.get_param("/server_nodes//Yaw")
+		mark_r = rospy.get_param("/marker_parameters/Roll")
+		mark_p = rospy.get_param("/marker_parameters/Pitch")
+		mark_y = rospy.get_param("/marker_parameters/Yaw")
 		
 		
-		quat_enter = tf.transformations.quaternion_from_euler(r, p, y)
+		quat_enter = tf.transformations.quaternion_from_euler(mark_r, mark_p, mark_y)
 		
-		self.marker.pose.orientation.x = quat_enter[0]
-		self.marker.pose.orientation.y = quat_enter[1]
-		self.marker.pose.orientation.z = quat_enter[2]
-		self.marker.pose.orientation.w = quat_enter[3]
-	
-		self.marker_pub.publish(self.marker)
+		
 
-
+		self.br.sendTransform((mark_x, mark_y,mark_z),
+                     tf.transformations.quaternion_from_euler(mark_r, mark_p, mark_y),
+                     rospy.Time.now(),
+                     "position_voulue",
+                     "map")
 		
-	
+		"""
 		if self.numero_cam==1: # si je n'ai pas encore enregistre la position de cam1
 			if self.input==1:
 				try:
@@ -168,7 +167,7 @@ class create_tf:
 				
 				self.tf_enter = [0,1,0]
 				self.rot_enter = [0,0,0]
-				self.sens_enter = [1,-1,1]
+				self.sens_enter = [1,1,1]
 
 				quat_enter = tf.transformations.quaternion_from_euler(self.rot_enter[0], self.rot_enter[1], self.rot_enter[2])
 

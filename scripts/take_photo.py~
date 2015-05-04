@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import roslib
-roslib.load_manifest('detection_multi_cam')
+roslib.load_manifest('mark_tracker')
 import sys
 import rospy
 import cv2
@@ -15,7 +15,7 @@ from cv_bridge import CvBridge, CvBridgeError
 from os import chdir
 # import IPython
 
-chdir("/home/sfress/catkin_ws/src/detection_multi_cam") # to put lauch_tf in the right folder
+chdir("/home/sfress/catkin_ws/src/mark_tracker") # to put lauch_tf in the right folder
 class take_photo:
 
   def __init__(self):
