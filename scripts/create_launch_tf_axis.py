@@ -80,7 +80,7 @@ class create_tf:
 			print message
 			print "======"
 			mon_fichier.write(message)
-			rospy.signal_shutdown('calibration gggggggggggggggggggggggggggggggggggggggfile written ! You can now launch "detection_post_calib" node ')
+			rospy.signal_shutdown('init file written ! You can now launch "detection_post_calib" node ')
 			
 
 
@@ -92,7 +92,9 @@ class create_tf:
 					marqueur='/ar_marker_'+str(self.input)
 					trans,rot = self.listener.lookupTransform(marqueur, '/map', rospy.Time(0))
 				except Exception, e:
-					print "can't read calibration files !! they should be in /src/StereoColorTracking-master/camera_info/ : ",e  
+					message_error="can't read the position of the mark! : is the mark number"+str(self.input)+"visible on the camera ?"
+					rospy.logwarn("can't read the position of the mark! : is the mark number %s visible on the camera ?", self.input)
+					print e  
 
 
 				quaternion=(rot)
