@@ -1,0 +1,4 @@
+<launch>
+    <node pkg="tf" type="static_transform_publisher" 
+        name="link_robot_mark" args=" 0.0800433068515 0.0342630658807 -0.214104826059 -0.0115483079877 0.211829501799 -0.100868825331 0.972018713208 ar_marker_2 /my_link_to_body 30"/>
+</launch>
