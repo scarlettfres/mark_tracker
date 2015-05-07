@@ -24,7 +24,7 @@ temps_erreur=1  #sec
 class link_head_robot:
     def __init__(self,body_part,id_mark,x,y,path):
 
-	chdir("/home/sfress/catkin_ws/src/mark_tracker/launch/") # to put lauch_tf in the right folder
+	chdir(path) # to put lauch_tf in the right folder
 	self.mon_fichier = open("launch_link_robot_mark.launch", "w")
         self.robot_body_part=body_part
         self.ID_markeur=int(id_mark)
