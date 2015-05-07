@@ -19,7 +19,7 @@ from os import chdir
 nbr_camera=1 #TODO
 chdir("/home/sfress/catkin_ws/src/mark_tracker/launch/") # to put lauch_tf in the right folder
 
-mon_fichier = open("launch_tf.launch", "w")
+mon_fichier = open("launch_tf_cam_map.launch", "w")
 
 
 class create_tf:

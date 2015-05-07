@@ -1,6 +1,6 @@
 <launch>
 	
-	<include file="$(find detection_multi_cam)/launch/launch_tf.launch"/>
+	<include file="$(find mark_tracker)/launch/launch_tf_cam_map.launch"/>
 
 	<!--   *********************** Camera0 *************   -->
 	
@@ -16,9 +16,12 @@
  	</node>
 
 
-	<!--**************************** Camera1 ***************************-->
 
-	
+
+
+	<!--**************************** Camera1 (if several !! ) ***************************-->
+
+	<!--
 	<arg name="cam_image_topic1" default="/cam1/image_raw" />
 	<arg name="cam_info_topic1" default="/cam1/camera_info" />		
 	<arg name="output_frame1" default="/camera1" />
@@ -26,6 +29,6 @@
 	<node name="ar_track_alvar1" pkg="ar_track_alvar" type="individualMarkersNoKinect" respawn="false" output="screen" args="$(arg marker_size) $(arg max_new_marker_error) $(arg max_track_error) $(arg cam_image_topic1) $(arg cam_info_topic1) $(arg output_frame1)" >
 	<remap from="/visualization_marker" to="cam1/visualization_marker"/>
  	</node>
-
-
+	-->
+	
 </launch>

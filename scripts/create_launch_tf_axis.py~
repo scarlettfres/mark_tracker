@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import roslib
-roslib.load_manifest('detection_multi_cam')
+roslib.load_manifest('mark_tracker')
 import sys
 import rospy
 import cv2
@@ -17,9 +17,9 @@ from os import chdir
 
 
 nbr_camera=1 #TODO
-chdir("/home/sfress/catkin_ws/src/detection_multi_cam/launch/") # to put lauch_tf in the right folder
+chdir("/home/sfress/catkin_ws/src/mark_tracker/launch/") # to put lauch_tf in the right folder
 
-mon_fichier = open("launch_tf.launch", "w")
+mon_fichier = open("launch_tf_cam_map.launch", "w")
 
 
 class create_tf:
@@ -80,17 +80,21 @@ class create_tf:
 			print message
 			print "======"
 			mon_fichier.write(message)
+			rospy.signal_shutdown('init file written ! You can now launch "detection_post_calib" node ')
+			
 
 
 
 	def mark0_callback(self,data):
-		print " coucou"
 		if self.numero_cam==0: # si je n'ai pas encore enregistre la position de cam0
-			if self.input==0:
+			if self.input!=-1:
 				try:
-					trans,rot = self.listener.lookupTransform('/ar_marker_1', '/map', rospy.Time(0))
+					marqueur='/ar_marker_'+str(self.input)
+					trans,rot = self.listener.lookupTransform(marqueur, '/map', rospy.Time(0))
 				except Exception, e:
-					print "can't read calibration files !! they should be in /src/StereoColorTracking-master/camera_info/ : ",e  
+					message_error="can't read the position of the mark! : is the mark number"+str(self.input)+"visible on the camera ?"
+					rospy.logwarn("can't read the position of the mark! : is the mark number %s visible on the camera ?", self.input)
+					print e  
 
 
 				quaternion=(rot)
@@ -105,14 +109,14 @@ class create_tf:
 					self.numero_cam += 1
 					self.compteur = 0
 			else:
-				self.input = input("put 0 to calibrate first cam: \n")
+				self.input = input("put the number of your calibration mark: \n")
 
 	
 
 				
 def main(args):
 
-	rospy.init_node('create_tf', anonymous=True)
+	s=rospy.init_node('create_tf', anonymous=True)
 	noeud = create_tf()
 	try:
 		rospy.spin()

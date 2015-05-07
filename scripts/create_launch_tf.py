@@ -16,12 +16,10 @@ from os import chdir
 
 
 
-
-
-nbr_camera=2 #TODO
+nbr_camera=1 #TODO
 chdir("/home/sfress/catkin_ws/src/mark_tracker/launch/") # to put lauch_tf in the right folder
 
-mon_fichier = open("launch_tf.launch", "w")
+mon_fichier = open("launch_tf_cam_map.launch", "w")
 
 
 class create_tf:
@@ -29,7 +27,7 @@ class create_tf:
 	def __init__(self):
 
 		rospy.Subscriber("/cam0/visualization_marker", Marker,self.mark0_callback)
-		rospy.Subscriber("/cam1/visualization_marker", Marker,self.mark1_callback)
+		
 		self.marker_pub = rospy.Publisher("marqueur_rviz", Marker)
 
 		self.listener = tf.TransformListener()
@@ -70,31 +68,33 @@ class create_tf:
 
 			message=message + str("""
 	<node pkg="tf" type="static_transform_publisher" 
-		name="camera""")
-
-			message = message +str(num)+str("""" args=" """)
+		name="camera_axis" args=" """)
 		
 		#0.175462652377 0.085071202854 2.94358463649 1.53053258111 -0.178616594811 -3.0794539535 /camera /map 30
 			message = message+ str(data.pose.position.x)+" "+str(data.pose.position.y)+" "+str(data.pose.position.z)+" "	# transaltion puis rotation (attention pas le meme ordre dangles)
-			message = message+str(euler[2])+" "+str(euler[1])+" "+str(euler[0])+" /map /axis_camera 30"/>
-
+			message = message+str(euler[2])+" "+str(euler[1])+" "+str(euler[0])+" /map /camera0" +str(""" 30"/>
+""")
 			if num == nbr_camera-1:
 				message=message + "</launch>"
 			print "======message saved in launchfile : "
 			print message
 			print "======"
 			mon_fichier.write(message)
-
+			rospy.signal_shutdown('init file written ! You can now launch "detection_post_calib" node ')
+			
 
 
 
 	def mark0_callback(self,data):
 		if self.numero_cam==0: # si je n'ai pas encore enregistre la position de cam0
-			if self.input==0:
+			if self.input!=-1:
 				try:
-					trans,rot = self.listener.lookupTransform('/ar_marker_0', '/map', rospy.Time(0))
+					marqueur='/ar_marker_'+str(self.input)
+					trans,rot = self.listener.lookupTransform(marqueur, '/map', rospy.Time(0))
 				except Exception, e:
-					print "can't read calibration files !! they should be in /src/StereoColorTracking-master/camera_info/ : ",e  
+					message_error="can't read the position of the mark! : is the mark number"+str(self.input)+"visible on the camera ?"
+					rospy.logwarn("can't read the position of the mark! : is the mark number %s visible on the camera ?", self.input)
+					print e  
 
 
 				quaternion=(rot)
@@ -109,75 +109,14 @@ class create_tf:
 					self.numero_cam += 1
 					self.compteur = 0
 			else:
-				self.input = input("put 0 to calibrate first cam: \n")
+				self.input = input("put the number of your calibration mark: \n")
 
-	def mark1_callback(self,data):
 	
-		"""
-		mark_x = rospy.get_param("/marker_parameters/x")
-		mark_y = rospy.get_param("/marker_parameters/y")
-		mark_z = rospy.get_param("/marker_parameters/z")
-		
-		mark_r = rospy.get_param("/marker_parameters/Roll")
-		mark_p = rospy.get_param("/marker_parameters/Pitch")
-		mark_y = rospy.get_param("/marker_parameters/Yaw")
-		
-		
-		quat_enter = tf.transformations.quaternion_from_euler(mark_r, mark_p, mark_y)
-		
-		
-
-		self.br.sendTransform((mark_x, mark_y,mark_z),
-                     tf.transformations.quaternion_from_euler(mark_r, mark_p, mark_y),
-                     rospy.Time.now(),
-                     "position_voulue",
-                     "map")
-		
-		"""
-		if self.numero_cam==1: # si je n'ai pas encore enregistre la position de cam1
-			if self.input==1:
-				try:
-					trans,rot = self.listener.lookupTransform('/ar_marker_1', '/camera1', rospy.Time(0))
-				except Exception, e:
-					print "can't read calibration files !! they should be in /src/StereoColorTracking-master/camera_info/ : ",e  
-
-				quaternion=(rot)
-				data.pose.position.x=trans[0]*self.sens_enter[0] + self.tf_enter[0]
-				data.pose.position.y=trans[1]*self.sens_enter[1] + self.tf_enter[1]
-				data.pose.position.z=trans[2]*self.sens_enter[2] + self.tf_enter[2]
-				#print quaternion
-
-				euler = tf.transformations.euler_from_quaternion(quaternion)
-				#self.marker_pub.publish(self.marker)
-				
-				
-				self.compteur += 1
-				if self.compteur == 10:
-					print euler
-					#euler = (euler[0] + self.tf_enter[3], euler[1] + self.tf_enter[4], euler[2] + self.tf_enter[5])
-					print euler
-					self.write_launch(data,euler,1)
-					self.numero_cam += 1
-					self.compteur = 0
-			else:
-				self.input = input("put 1 to calibrate first cam: \n")
-				#self.tf_enter = input("enter translation [0,0.97,0] between first mark and second  noangles: \n")
-				#self.rot_enter = input("enter translation roll , pitch , yaw : [0,0.97,0] between first mark and second  noangles: \n")
-				#self.sens_enter = input("enter sens [1,-1,1] between first mark and second  noangles: \n")
-				
-				self.tf_enter = [0,1,0]
-				self.rot_enter = [0,0,0]
-				self.sens_enter = [1,1,1]
-
-				quat_enter = tf.transformations.quaternion_from_euler(self.rot_enter[0], self.rot_enter[1], self.rot_enter[2])
-
-				
-
 
 				
 def main(args):
 
-	rospy.init_node('create_tf', anonymous=True)
+	s=rospy.init_node('create_tf', anonymous=True)
 	noeud = create_tf()
 	try:
 		rospy.spin()

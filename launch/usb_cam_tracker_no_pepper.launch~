@@ -13,12 +13,4 @@
 	</node>
 
 
-<!-- ############## lien avc le robot ############ -->
-	<include file="$(find mark_tracker)/launch/launch_link_robot_mark.launch"/>
-	
-	<arg name="body_part" default="/HeadTouchFront_frame" />
-	<arg name="id_mark" default="2" />
-	<node name="link_head_mark" pkg="mark_tracker" type="link_head_mark.py" output="screen" respawn="false" args="$(arg body_part) $(arg id_mark)" /> 
-  	<node name="publish_coordinates" pkg="mark_tracker" type="publish_coord.py" output="log" respawn="false" /> 
-   
 </launch>

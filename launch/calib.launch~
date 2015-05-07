@@ -45,7 +45,7 @@
 
 	<!--*********************** mon_noeud ***********************************-->
 
-	<node name="calibration_multi_cam" pkg="detection_multi_cam" type="create_launch_tf.py" output="screen" respawn="false" > 
+	<node name="calibration_multi_cam" pkg="mark_tracker" type="create_launch_tf.py" output="screen" respawn="false" > 
     <param name="nbr_cam" value="2" />
 	</node>
 	

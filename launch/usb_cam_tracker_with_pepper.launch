@@ -1,6 +1,8 @@
 <launch>
 <!-- ############## launch camera ############ -->
-	<include file="$(find axis_cam_modified)/launch/axis_basics.launch"/>
+	<include file="$(find mark_tracker)/launch/camera.launch"/>
+	
+	
 	
 <!-- ############## launch tf_init + ar_track_alvar ############ 
 # here we use the bash timed_roslaunch.sh to delay the second launchfile 
@@ -8,17 +10,25 @@
 -->
 	
 	<node pkg="mark_tracker" type="timed_roslaunch.sh" 
-	args="1 mark_tracker detection_post_calib_axis.launch " 
+	args="1 mark_tracker detection_post_calib.launch " 
 	name="timed_roslaunch" output="screen">
 	</node>
 
 
-<!-- ############## lien avc le robot ############ -->
-	<include file="$(find mark_tracker)/launch/launch_link_robot_mark.launch"/>
+
+
+<!-- ############## link with the robot ############ -->
+	<include file="$(find mark_tracker)/launch/launch_link_robot_mark.launch"/>     <!-- is the tf static publisher -->
 	
 	<arg name="body_part" default="/HeadTouchFront_frame" />
 	<arg name="id_mark" default="2" />
+	
 	<node name="link_head_mark" pkg="mark_tracker" type="link_head_mark.py" output="screen" respawn="false" args="$(arg body_part) $(arg id_mark)" /> 
   	<node name="publish_coordinates" pkg="mark_tracker" type="publish_coord.py" output="log" respawn="false" /> 
-   
+
+
+
+
+
+
 </launch>
