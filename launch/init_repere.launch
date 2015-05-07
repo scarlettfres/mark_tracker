@@ -44,7 +44,13 @@
 
 	<!--*********************** mon_noeud ***********************************-->
 
-	<node name="calibration_multi_cam" pkg="mark_tracker" type="create_launch_tf_axis.py" output="screen" respawn="false" > 
+
+
+	<arg name="launch_path" default="$(find mark_tracker)/launch"/>
+	<arg name="camera_name" default="/axis_camera"/>
+	
+	
+	<node name="calibration_multi_cam" pkg="mark_tracker" type="create_launch_tf.py" output="screen" respawn="false" args="$(arg launch_path) $(arg camera_name)"> 
     <param name="nbr_cam" value="2" />
 	</node>
 

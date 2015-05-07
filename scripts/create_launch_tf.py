@@ -17,17 +17,21 @@ from os import chdir
 
 
 nbr_camera=1 #TODO
-chdir("/home/sfress/catkin_ws/src/mark_tracker/launch/") # to put lauch_tf in the right folder
+#chdir("/home/sfress/catkin_ws/src/mark_tracker/launch/") # to put lauch_tf in the right folder
 
 mon_fichier = open("launch_tf_cam_map.launch", "w")
 
 
 class create_tf:
 
-	def __init__(self):
+	def __init__(self,launch_path,camera_name):
 
 		rospy.Subscriber("/cam0/visualization_marker", Marker,self.mark0_callback)
 		
+		chdir(launch_path)
+		self.mon_fichier=open("launch_tf_cam_map.launch", "w")
+		self.camera_name=camera_name
+
 		self.marker_pub = rospy.Publisher("marqueur_rviz", Marker)
 
 		self.listener = tf.TransformListener()
@@ -72,14 +76,14 @@ class create_tf:
 		
 		#0.175462652377 0.085071202854 2.94358463649 1.53053258111 -0.178616594811 -3.0794539535 /camera /map 30
 			message = message+ str(data.pose.position.x)+" "+str(data.pose.position.y)+" "+str(data.pose.position.z)+" "	# transaltion puis rotation (attention pas le meme ordre dangles)
-			message = message+str(euler[2])+" "+str(euler[1])+" "+str(euler[0])+" /map /camera0" +str(""" 30"/>
+			message = message+str(euler[2])+" "+str(euler[1])+" "+str(euler[0])+" /map "+str(self.camera_name) +str(""" 30"/>
 """)
 			if num == nbr_camera-1:
 				message=message + "</launch>"
 			print "======message saved in launchfile : "
 			print message
 			print "======"
-			mon_fichier.write(message)
+			self.mon_fichier.write(message)
 			rospy.signal_shutdown('init file written ! You can now launch "detection_post_calib" node ')
 			
 
@@ -113,16 +117,42 @@ class create_tf:
 
 	
 
+
+def updateArgs(arg_defaults):
+    '''Look up parameters starting in the driver's private parameter space, but
+    also searching outer namespaces.  '''
+    args = {}
+    for name, val in arg_defaults.iteritems():
+        full_name = rospy.search_param(name)
+        if full_name is None:
+            args[name] = val
+        else:
+            args[name] = rospy.get_param(full_name, val)
+   
+    return(args)
+
+
+   
+
 				
 def main(args):
 
 	s=rospy.init_node('create_tf', anonymous=True)
-	noeud = create_tf()
+	print "1", args[0]
+	print "2", args[1]
+	print "3", args[2]
+	arg_defaults = {
+		'launch_path': "/home/sfress/catkin_ws/src/mark_tracker/launch/",
+		'camera_name': "/axis_camera"
+	}
+	#args=updateArgs(arg_defaults)
+	#print args, "aaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+	noeud = create_tf(args[1],args[2])
 	try:
 		rospy.spin()
 	except KeyboardInterrupt:
 		print "Shutting down"
-		mon_fichier.close()
+		self.mon_fichier.close()
 		print "Finished."
 
 if __name__ == '__main__':
