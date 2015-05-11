@@ -1,4 +1,4 @@
 <launch>
     <node pkg="tf" type="static_transform_publisher" 
-        name="link_robot_mark" args=" 0.289274981372 0.0170633848393 -0.209125887382 0.00993510830171 0.203177482619 0.0131380572249 0.97900336855 ar_marker_2 /mon_tf/HeadTouchFront_frame 30"/>
+        name="link_robot_mark" args=" 0.126755462986 0.00314692586949 -0.229621360968 0.00399265469152 0.198999573385 0.015622302958 0.979866915531 ar_marker_2 /mon_tf/HeadTouchFront_frame 30"/>
 </launch>

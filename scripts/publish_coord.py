@@ -21,8 +21,11 @@ mon_fichier = open("fichier_pub.txt", "w")
 class publish_coord:
     def __init__(self):
 
-        self.coord_pub = rospy.Publisher("result/coord", Point, queue_size=5)
-        self.angle_pub = rospy.Publisher("result/angle", Point, queue_size=5)
+        #self.coord_pub = rospy.Publisher("result/coord", Point, queue_size=5)
+        #self.angle_pub = rospy.Publisher("result/angle", Point, queue_size=5)
+
+        self.angle_pub = rospy.Publisher("result/angle", Marker, queue_size=5)
+
         rospy.Subscriber("/cam0/visualization_marker", Marker,self.mark_callback)
         rospy.Timer(rospy.Duration(0.1), self.timer_callback)
         self.listener = tf.TransformListener()

@@ -15,7 +15,7 @@ from tf.transformations import quaternion_from_euler, euler_from_quaternion
 
 
 id_markeur_tete=2
-temps_erreur=1  #sec 
+temps_erreur=0.5  #sec 
 markeur="ar_marker_"+str(id_markeur_tete)
 robot_body_part="/HeadTouchFront_frame"
 
@@ -31,6 +31,20 @@ class link_head_robot:
         self.broadcaster = tf.TransformBroadcaster()
         self.detection=0
 
+        self.result_position = Marker()
+        self.result_position.header.frame_id = "/result_position"
+        self.result_position.type = self.result_position.SPHERE
+        self.result_position.action = self.result_position.ADD
+        self.result_position.scale.x = 0.2
+        self.result_position.scale.y = 0.2
+        self.result_position.scale.z = 0.2
+        self.result_position.color.a = 1.0
+        
+        self.result_position.color.r = 0.0
+        self.result_position.color.g = 1.0
+        self.result_position.color.b = 0.0
+        self.result_position.color.a = 1.0
+
         print type(self.robot_body_part),type(self.id_markeur_tete),type(self.markeur)
 
 
@@ -42,6 +56,7 @@ class link_head_robot:
         self.clock_verif_erreur = rospy.Time.now() + rospy.Duration(temps_erreur)
         rospy.Subscriber("/joint_states", JointState ,self.joint_state_callback)
         rospy.Subscriber("/cam0/visualization_marker", Marker,self.mark_callback)
+        self.pub = rospy.Publisher("result_position", Marker, queue_size=5)
         
     def mark_callback(self,data):
         if data.id==self.id_markeur_tete:
@@ -49,11 +64,10 @@ class link_head_robot:
             self.detection=1
         elif rospy.Time.now()> self.clock_verif_erreur:
             self.detection=0
-            print "non detection de la marque ", self.id_markeur_tete
-        
+           
     def joint_state_callback(self,data):   
-        if self.detection==1 :
-            now = rospy.Time.now()
+        now = rospy.Time.now()
+        if rospy.Time.now()< self.clock_verif_erreur:
             try:
                 # comment est le frame sur lequel la mark est fixee par rapport a la base?
                 (trans,rot) = self.listener.lookupTransform(self.robot_body_part,"base_link", rospy.Time(0))
@@ -61,16 +75,46 @@ class link_head_robot:
                 self.broadcaster.sendTransform(trans,rot,now,"/mon_tf/base_link","/mon_tf"+self.robot_body_part)
                 # comment est notre base_link virtuel apr rapport a notre map? 
                 (trans_fin,rot_fin) = self.listener.lookupTransform( "/mon_tf/base_link", "/map", rospy.Time(0))  
+                self.broadcaster.sendTransform(trans_fin,rot_fin,now, "/map","/base_link")  
+
                 if trans_fin[2]<1 :     # on continue d'envoyer l'ancienne position connue si bug inclinaison mark
+                   
+                    (trans_tosend,rot_tosend) = self.listener.lookupTransform("/map","/base_footprint", rospy.Time(0)) 
                     #self.old_t=trans_fin
                     #self.old_r=rot_fin
                     #self.broadcaster.sendTransform(trans_fin,rot_fin,now, "/map","/base_link")
                     print "OK"
+
+                    self.result_position.pose.orientation.x = rot_tosend[0]
+                    self.result_position.pose.orientation.y = rot_tosend[1]
+                    self.result_position.pose.orientation.z = rot_tosend[2]
+                    self.result_position.pose.orientation.w = rot_tosend[3]
+                    self.result_position.pose.position.x = trans_tosend[0]
+                    self.result_position.pose.position.y = trans_tosend[1]
+                    self.result_position.pose.position.z = trans_tosend[2]
+                    self.result_position.text="detected"
+                    self.pub.publish(self.result_position)
+
                 else:
                     print "BUG INCLINAISON MARK"
-                self.broadcaster.sendTransform(trans_fin,rot_fin,now, "/map","/base_link")
+
+                
             except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
                 print "wait for tf ... " 
+        else:
+            print "non detection de la marque ", self.id_markeur_tete
+            self.result_position.pose.orientation.x = 1
+            self.result_position.pose.orientation.y = 1
+            self.result_position.pose.orientation.z = 1
+            self.result_position.pose.orientation.w = 1
+            self.result_position.pose.position.x = 1
+            self.result_position.pose.position.y = 1
+            self.result_position.pose.position.z = 1
+            self.result_position.text="undetected"
+            self.pub.publish(self.result_position)
+
+        
+
 
 
 
