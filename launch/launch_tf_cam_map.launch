@@ -1,4 +1,4 @@
 <launch>
 	<node pkg="tf" type="static_transform_publisher" 
-		name="camera_axis" args=" -1.43455398204 -0.178212423073 2.46847390735 -1.6314189595 0.0468101609477 -2.43300365358 /map /camera0 30"/>
+		name="camera_axis" args=" -1.59690239699 -2.24938418758 2.90575979732 -0.998547278005 -0.025155022512 -2.17912518387 /map /axis_camera 30"/>
 </launch>
